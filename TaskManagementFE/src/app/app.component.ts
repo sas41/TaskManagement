@@ -14,10 +14,7 @@ import { AuthService } from './services/auth/auth.service';
 export class AppComponent {
   title = 'TaskManagementFE';
   
-  constructor(private auth: AuthService)
-  {
-    console.log(auth);
-  }
+  constructor(private auth: AuthService) {}
 
   onLogout(): void {
     this.auth.logout();

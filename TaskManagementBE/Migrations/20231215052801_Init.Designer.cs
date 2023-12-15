@@ -12,7 +12,7 @@ using TaskManagementBE;
 namespace TaskManagementBE.Migrations
 {
     [DbContext(typeof(TaskManagementContext))]
-    [Migration("20231214030826_Init")]
+    [Migration("20231215052801_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -135,12 +135,12 @@ namespace TaskManagementBE.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CreatorId")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("DateAdded")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("getutcdate()");
 
                     b.Property<DateTime?>("ReminderDate")
                         .HasColumnType("datetime2");
@@ -199,12 +199,12 @@ namespace TaskManagementBE.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CreatorId")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("DateAdded")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("getutcdate()");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -358,18 +358,16 @@ namespace TaskManagementBE.Migrations
                     b.HasOne("TaskManagementBE.Models.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskManagementBE.Models.Task", "Task")
-                        .WithMany("Comments")
-                        .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Creator");
+                    b.HasOne("TaskManagementBE.Models.Task", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Task");
+                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("TaskManagementBE.Models.Task", b =>
@@ -377,7 +375,7 @@ namespace TaskManagementBE.Migrations
                     b.HasOne("TaskManagementBE.Models.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Creator");

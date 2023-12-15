@@ -21,8 +21,13 @@ namespace TaskManagementBE
             base.OnModelCreating(builder);
 
             builder.Entity<Models.Task>()
+                .HasOne(task => task.Creator)
+                .WithMany()
+                .HasForeignKey(task => task.CreatorId)
+                .OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Models.Task>()
                 .HasMany(task => task.Comments)
-                .WithOne(comment => comment.Task)
+                .WithOne()
                 .HasForeignKey(comment => comment.TaskId)
                 .OnDelete(DeleteBehavior.Cascade);
             builder.Entity<Models.Task>()
@@ -33,12 +38,25 @@ namespace TaskManagementBE
                 .Property(task => task.DateAdded)
                 .ValueGeneratedOnAddOrUpdate()
                 .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+            builder.Entity<Models.Task>()
+                .Property(task => task.CreatorId)
+                .ValueGeneratedNever();
+            builder.Entity<Models.Task>()
+                .Property(task => task.DateAdded)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("getutcdate()")
+                .ValueGeneratedOnAdd();
 
             builder.Entity<Models.Comment>()
-                .HasOne(comment => comment.Task)
-                .WithMany(task => task.Comments)
-                .HasForeignKey(comment => comment.TaskId)
+                .HasOne(comment => comment.Creator)
+                .WithMany()
+                .HasForeignKey(comment => comment.CreatorId)
                 .OnDelete(DeleteBehavior.NoAction);
+            //builder.Entity<Models.Comment>()
+            //    .HasOne(comment => comment.Task)
+            //    .WithMany(task => task.Comments)
+            //    .HasForeignKey(comment => comment.TaskId)
+            //    .OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Models.Comment>()
                 .Property(comment => comment.CreatorId)
                 .ValueGeneratedOnAddOrUpdate()
@@ -47,6 +65,17 @@ namespace TaskManagementBE
                 .Property(comment => comment.DateAdded)
                 .ValueGeneratedOnAddOrUpdate()
                 .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+            builder.Entity<Models.Comment>()
+                .Property(comment => comment.CreatorId)
+                .ValueGeneratedNever();
+            builder.Entity<Models.Comment>()
+                .Property(comment => comment.TaskId)
+                .ValueGeneratedNever();
+            builder.Entity<Models.Comment>()
+                .Property(comment => comment.DateAdded)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("getutcdate()")
+                .ValueGeneratedOnAdd();
         }
     }
 }

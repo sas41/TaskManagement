@@ -1,0 +1,85 @@
+<div class="d-flex align-items-center justify-content-center">
+    <div class="w-75">
+        <div>
+            <h3 class="font-weight-bold">{{task.title}}</h3>
+            <div class="d-block mb-3">
+                <span class="badge badge-pill bg-primary" *ngIf="task.type === 'Task'">{{task.type}}</span>
+                <span class="badge badge-pill bg-info" *ngIf="task.type === 'Bug'">{{task.type}}</span>
+
+                <span class="badge badge-pill bg-danger ms-1" *ngIf="task.status === 'New'">Status: {{task.status}}</span>
+                <span class="badge badge-pill bg-warning ms-1" *ngIf="task.status === 'InProgress'">Status: {{task.status}}</span>
+                <span class="badge badge-pill bg-success ms-1" *ngIf="task.status === 'Done'">Status: {{task.status}}</span>
+
+                <span class="badge badge-pill bg-info ms-1">Next Action: {{dateDisplay(task.nextActionDate)}}</span>
+
+                <span class="badge badge-pill bg-dark ms-1">Owner: {{task.creator.username}}</span>
+                <span class="badge badge-pill bg-dark ms-1">Due: {{dateDisplay(task.requiredBy)}}</span>
+                <span class="badge badge-pill bg-dark ms-1">Created: {{dateDisplay(task.dateAdded)}}</span>
+
+                <span class="float-end">
+                        <button class="btn btn-primary" *ngIf="auth.isOwnerOrAdmin(task.creator.id ?? '')" (click)="editTask()">Edit</button>
+                        <button class="btn btn-danger ms-2" *ngIf="auth.isOwnerOrAdmin(task.creator.id ?? '')" (click)="deleteTask()">Delete</button>
+                </span>
+            </div>
+            <div>
+                <span class="me-1">Assigned to:</span>
+                <span *ngIf="!assignedToAnyone">
+                    <span class="badge bg-danger me-1">Nobody</span>
+                </span>
+                <span  *ngIf="assignedToAnyone">
+                    <span class="badge bg-warning me-1" *ngFor="let assignee of task.assignees">{{assignee}}</span>
+                </span>
+                <span class="badge bg-success pointer" id="assign" *ngIf="auth.isOwnerOrAdmin(task.creator.id ?? '')" (click)="editAssigned()">+</span>
+            </div>
+            <div class="d-block card mt-3">
+                <div class="card-body">
+                    <pre class="fs-5">{{task.description}}</pre>
+                </div>
+            </div>
+            <hr>
+        </div>
+        <div *ngIf="displayCommentsSection()">
+            <h4 class="font-weight-bold">Comments:</h4>
+            <div class="d-block card" *ngFor="let comment of task.comments">
+                <div class="card-body">
+                    <h5>
+                        <span class="badge badge-pill bg-success">{{comment.creator.username}}:</span>
+                        <span class="badge badge-pill bg-info float-end" *ngIf="comment.type === 'Reminder'">Due: {{dateDisplay(comment.reminderDate)}}</span>
+                    </h5>
+                    <pre class="fs-5">{{comment.text}}</pre>
+                    <button class="btn btn-warning me-3" *ngIf="auth.isOwner(comment.creator.id)" (click)="editComment(comment)">Edit</button>
+                    <button class="btn btn-danger" *ngIf="auth.isOwnerOrAdmin(comment.creator.id)" (click)="deleteComment(comment)">Delete</button>
+                </div>
+            </div>
+            <hr>
+        </div>
+        <div class="d-block card" id="commentForm">
+            <div class="card-body">
+                <form class="form-inline" [formGroup]="commentForm" (ngSubmit)="onCommentSubmit()">
+                    <div class="grid">
+                        <span class="split">
+                            <label class="pe-1 pt-2" for="type">Type</label>
+                            <select class="form-select" id="type" required formControlName="type">
+                                <option *ngFor="let type of commentTypes" [value]="type">{{type}}</option>
+                            </select>
+                        </span>
+
+                        <span class="split date" *ngIf="commentForm.value.type === 'Reminder'">
+                            <label class="pe-1 pt-2" for="reminderDate">Reminder Date</label>
+                            <input type="date" class="form-control" id="reminderDate" aria-describedby="reminderDate" formControlName="reminderDate">
+                        </span>
+                    </div>
+                    <div class="d-block pt-3 pb-3">
+                        <textarea rows="5" class="form-control" id="text" formControlName="text"></textarea>
+                    </div>
+                    
+                    <div class="splitBtns">
+                        <button type="submit" class="btn btn-primary me-3" *ngIf="!isUpdate">Post Comment</button>
+                        <button type="submit" class="btn btn-warning me-3" *ngIf="isUpdate">Update Comment</button>
+                        <button class="btn btn-danger ms-3" *ngIf="isUpdate" (click)="cancelEditComment()">Cancel Edit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

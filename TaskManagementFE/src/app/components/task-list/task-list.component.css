@@ -1,0 +1,4 @@
+table tr:hover td {
+    background: #efefef;
+    cursor: pointer;
+  }

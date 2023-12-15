@@ -88,7 +88,7 @@ namespace TaskManagementBE.Controllers
             return Ok(users);
         }
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         [AllowAnonymous]
         public async Task<ActionResult<string>> Login([FromBody] AuthRequest credentials)
         {

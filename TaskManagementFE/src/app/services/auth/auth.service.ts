@@ -32,6 +32,10 @@ export class AuthService {
   isOwner(id: string) {
     return this.id === id;
   }
+  
+  isOwnerOrAdmin(id: string) {
+    return (this.id === id || this.roles?.includes('Admin'));
+  }
 
   get getRoles() {
     return this.roles;
@@ -61,7 +65,7 @@ export class AuthService {
   login(credentials: any) {
     if (credentials.username !== '' && credentials.password !== '' )
     {
-      return this.server.request('POST', '/api/User/login', {
+      return this.server.request('POST', '/api/User/Login', {
         username: credentials.username,
         password: credentials.password
       }).subscribe((response: any) => {

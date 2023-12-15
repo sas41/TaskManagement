@@ -5,10 +5,42 @@ using System.Text.Json.Serialization;
 
 namespace TaskManagementBE.Models
 {
+    public enum CommentType
+    {
+        Comment,
+        Reminder
+    }
+    public struct CommentCreateModel
+    {
+        public Guid? Id { get; set; }
+        [Required]
+        public Guid TaskId { get; set; }
+        [Required]
+        public CommentType Type { get; set; }
+        [Required]
+        public string Text { get; set; }
+        public DateTime? ReminderDate { get; set; }
+        public Comment ToComment()
+        {
+            return new Comment
+            {
+                TaskId = this.TaskId,
+                Type = this.Type,
+                Text = this.Text,
+                ReminderDate = this.ReminderDate
+            };
+        }
+        public void ApplyToComment(Comment comment)
+        {
+            comment.Type = this.Type;
+            comment.Text = this.Text;
+            comment.ReminderDate = this.ReminderDate;
+        }
+    }
     public struct CommentViewModel
     {
         public Guid Id { get; set; }
-        public Task Task { get; set; }
+        public Guid TaskId { get; set; }
         public UserViewModel Creator { get; set; }
         public DateTime DateAdded { get; set; }
         public DateTime? ReminderDate { get; set; }
@@ -17,7 +49,7 @@ namespace TaskManagementBE.Models
         public CommentViewModel(Comment comment)
         {
             Id = comment.Id;
-            Task = comment.Task;
+            TaskId = comment.TaskId;
             Creator = new UserViewModel(comment.Creator);
             DateAdded = comment.DateAdded;
             ReminderDate = comment.ReminderDate;
@@ -27,12 +59,6 @@ namespace TaskManagementBE.Models
         }
     }
 
-    public enum CommentType
-    {
-        Comment,
-        Reminder
-    }
-
     public class Comment
     {
         [Key]
@@ -40,14 +66,14 @@ namespace TaskManagementBE.Models
 
         [Required]
         public Guid TaskId { get; set; }
-        public Task Task { get; set; } = null!;
 
         [Required]
         public Guid CreatorId { get; set; }
         public User Creator { get; set; } = null!;
 
-        [Required]
-        public DateTime DateAdded { get; set; } = DateTime.Now;
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public DateTime DateAdded { get; set; }
 
         public DateTime? ReminderDate { get; set; }
 

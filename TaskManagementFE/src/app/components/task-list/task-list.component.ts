@@ -1,20 +1,36 @@
 import { Component } from '@angular/core';
-import { NgFor } from '@angular/common';
-import { ServerService } from '../../services/server/server.service';
+import { NgFor, formatDate } from '@angular/common';
+import { NgIf } from '@angular/common';
+import { AuthService } from '../../services/auth/auth.service';
+import { TaskService } from '../../services/task/task.service';
+import { Task } from '../../models/task';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-task-list',
   standalone: true,
-  imports: [NgFor],
+  imports: [NgFor, NgIf],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.css'
 })
 export class TaskListComponent {
-  tasks: any[] = [];
-  constructor(private server: ServerService)
+  tasks: Task[] = [];
+  constructor(public router: Router, public auth: AuthService, private taskService: TaskService)
   {
-    this.server.request('GET', '/api/Task').subscribe((data: any) => {
-      this.tasks = data;
+    taskService.getTasks().then((tasks) => {
+      this.tasks = tasks ?? [];
+      for (let task of this.tasks)
+      {
+        task.assignees = task.assignees?.map(assignee => assignee.name);
+      }
     });
+  }
+  
+  dateDisplay(date: string | undefined) {
+    return formatDate(date ?? '', 'yyyy-MM-dd', 'en');
+  }
+
+  navigateToTask(id: string) {
+    this.router.navigate([`/task/view/${id}`]);
   }
 }

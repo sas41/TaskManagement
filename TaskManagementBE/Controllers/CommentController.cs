@@ -24,22 +24,24 @@ namespace TaskManagementBE.Controllers
         }
 
         [HttpPost]
-        public ActionResult<CommentViewModel> Create(Comment comment)
+        public ActionResult<CommentViewModel> Create(CommentCreateModel newComment)
         {
-            comment.CreatorId = Guid.Parse(this.User.Claims.Where(claim => claim.ValueType == "id").First().Value);
+            Comment comment = newComment.ToComment();
+            comment.CreatorId = Guid.Parse(this.User.Claims.Where(claim => claim.Type == "id").First().Value);
             return Ok(new CommentViewModel(_commentService.Create(comment)));
         }
 
         [HttpPut("{id}")]
-        public ActionResult<CommentViewModel> Update(Guid id, Comment newComment)
+        public ActionResult<CommentViewModel> Update(Guid id, CommentCreateModel newComment)
         {
-            var comment = _commentService.GetById(id);
+            Comment comment = _commentService.GetById(id);
 
-            string callerId = this.User.Claims.Where(claim => claim.ValueType == "id").First().Value;
+            string callerId = this.User.Claims.Where(claim => claim.Type == "id").First().Value;
             bool isOwner = (callerId == comment.CreatorId.ToString());
             if (isOwner)
             {
-                return Ok(new CommentViewModel(_commentService.Update(newComment)));
+                newComment.ApplyToComment(comment);
+                return Ok(new CommentViewModel(_commentService.Update(comment)));
             }
             return Unauthorized();
         }
@@ -50,7 +52,7 @@ namespace TaskManagementBE.Controllers
             var comment = _commentService.GetById(id);
             var task = _taskService.GetById(comment.TaskId);
 
-            string callerId = this.User.Claims.Where(claim => claim.ValueType == "id").First().Value;
+            string callerId = this.User.Claims.Where(claim => claim.Type == "id").First().Value;
             bool isOwner = (callerId == comment.CreatorId.ToString());
 
             bool isAdmin = this.User.IsInRole("Admin");

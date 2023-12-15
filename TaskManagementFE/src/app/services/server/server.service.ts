@@ -22,7 +22,8 @@ export class ServerService {
     if (method === 'GET') {
       return this.get(route, data);
     }
-
+    
+    console.log(data);
     const header = (this.loggedIn) ? { Authorization: `Bearer ${this.token}` } : undefined;
 
     return this.http.request(method, this.baseUrl + route, {

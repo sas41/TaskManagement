@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace TaskManagementBE.Controllers
 {
@@ -15,34 +16,36 @@ namespace TaskManagementBE.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ITaskService _taskService;
+        private readonly UserManager<User> _userManager;
 
-        public TaskController(ITaskService taskService)
+        public TaskController(UserManager<User> userManager, ITaskService taskService)
         {
             _taskService = taskService;
+            _userManager = userManager;
         }
 
         [HttpPost]
-        public ActionResult<TaskViewModel> Create(Models.Task task)
+        public async Task<ActionResult<TaskViewModel>> Create(TaskCreateModel newTask)
         {
-            task.CreatorId = Guid.Parse(this.User.Claims.Where(claim => claim.ValueType == "id").First().Value);
-            task.Assignees = new List<User>();
-            task.Comments = new List<Comment>();
-            return Ok(new TaskViewModel(_taskService.Create(task)));
+            Models.Task task = newTask.ToTask();
+            string id = (this.User.Claims.Where(claim => claim.Type == "id").First().Value);
+            task.CreatorId = Guid.Parse(id);
+            var createdTask = _taskService.Create(task);
+            return Ok(new TaskViewModel(createdTask));
         }
 
         [HttpPut("{id}")]
-        public ActionResult<TaskViewModel> Update(Guid id, Models.Task newTask)
+        public ActionResult<TaskViewModel> Update(Guid id, TaskCreateModel newTask)
         {
             Models.Task task = _taskService.GetById(id);
 
-            string callerId = this.User.Claims.Where(claim => claim.ValueType == "id").First().Value;
+            string callerId = this.User.Claims.Where(claim => claim.Type == "id").First().Value;
             bool isOwner = (callerId == task.CreatorId.ToString());
             bool isAdmin = this.User.IsInRole("Admin");
             if (isOwner || isAdmin)
             {
-                newTask.Assignees = task.Assignees;
-                newTask.Comments = task.Comments;
-                return Ok(new TaskViewModel(_taskService.Update(newTask)));
+                newTask.ApplyToTask(task);
+                return Ok(new TaskViewModel(_taskService.Update(task)));
             }
             return Unauthorized();
         }
@@ -52,7 +55,7 @@ namespace TaskManagementBE.Controllers
         {
             Models.Task task = _taskService.GetById(id);
 
-            string callerId = this.User.Claims.Where(claim => claim.ValueType == "id").First().Value;
+            string callerId = this.User.Claims.Where(claim => claim.Type == "id").First().Value;
             bool isOwner = (callerId == task.CreatorId.ToString());
             bool isAdmin = this.User.IsInRole("Admin");
             if (isOwner || isAdmin)
@@ -73,7 +76,30 @@ namespace TaskManagementBE.Controllers
         [Authorize]
         public ActionResult<IEnumerable<TaskViewModel>> GetAll(string? search)
         {
-            return Ok(_taskService.GetAll(search).Select(t => new TaskViewModel(t)));
+            var tasks = _taskService.GetAll(search).Select(t => new TaskViewModel(t)).ToList();
+            return Ok(tasks);
+        }
+
+        [HttpPost("Assign/{id}")]
+        [Authorize]
+        public async Task<ActionResult<TaskViewModel>> Assign(Guid taskId, [FromBody]ICollection<Guid> userIds)
+        {
+            Models.Task task = _taskService.GetById(taskId);
+
+            string callerId = this.User.Claims.Where(claim => claim.Type == "id").First().Value;
+            bool isOwner = (callerId == task.CreatorId.ToString());
+            bool isAdmin = this.User.IsInRole("Admin");
+            if (isOwner || isAdmin)
+            {
+                foreach (Guid userId in userIds)
+                {
+                    var user = await _userManager.FindByIdAsync(userId.ToString());
+                    if (user != null) task.Assignees.Add(user);
+                }
+                _taskService.Update(task);
+                return Ok(new TaskViewModel(task));
+            }
+            return Unauthorized();
         }
     }
 }

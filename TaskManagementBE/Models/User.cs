@@ -18,6 +18,7 @@ namespace TaskManagementBE.Models
             Username = user.UserName;
             Roles = roles;
         }
+
         public UserViewModel(User user)
         {
             Id = user.Id.ToString();
