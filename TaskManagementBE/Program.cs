@@ -86,7 +86,6 @@ builder.Services.AddIdentityCore<User>(
     .AddRoles<Role>()
     .AddEntityFrameworkStores<TaskManagementContext>();
 
-
 var app = builder.Build();
 
 
@@ -100,10 +99,11 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+//app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.MapControllers();
 

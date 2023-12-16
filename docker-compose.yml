@@ -1,4 +1,5 @@
 version: "3.4"
+
 services:
     be:
         build:
@@ -6,7 +7,6 @@ services:
           dockerfile: ./Dockerfile
         ports:
           - "41001:80"
-          - "41002:443"
         depends_on:
           - db
     db:
@@ -21,7 +21,6 @@ services:
           context: ./TaskManagementFE
           dockerfile: ./Dockerfile
         ports:
-          - "41003:80"
-          - "41004:443"
+          - "41002:80"
         depends_on:
           - db

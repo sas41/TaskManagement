@@ -1,6 +1,6 @@
 {
     "/api": {
-        "target": "https://be:41002/",
-        "secure": true 
+        "target": "https://api.taskman.sas41.com/",
+        "secure": false
     }
 }
