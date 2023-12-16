@@ -17,4 +17,21 @@ export class Task {
         public comments?: any[],
         public nextActionDate?: string,
     ) { }
+
+    static get Placeholder() {
+        return new Task(
+            'Title',
+            'Description',
+            '1990-01-01',
+            'New',
+            'Task',
+            'id',
+            'creatorId',
+            { id:'cid', displayName: 'Creator' },
+            '1990-01-01',
+            [],
+            [],
+            '1990-01-01'
+        );
+    }
 }

@@ -16,7 +16,6 @@ using TaskManagementBE.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.ConfigureHttpJsonOptions(options =>
                 options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddControllers()
@@ -55,7 +54,7 @@ builder.Services.AddSwaggerGen(conf =>
 });
 
 
-string connectionString = builder.Configuration.GetConnectionString("TransferMateDB");
+string connectionString = builder.Configuration.GetConnectionString("TaskManagementDB");
 builder.Services.AddDbContext<TaskManagementContext>(options =>
                 options.UseSqlServer(connectionString));
 
@@ -92,11 +91,14 @@ var app = builder.Build();
 
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
@@ -108,6 +110,7 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<TaskManagementContext>();
+    context.Database.Migrate();
     await SeedData.Seed(context);
 }
 

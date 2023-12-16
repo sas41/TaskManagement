@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
-import { NgFor, formatDate } from '@angular/common';
-import { NgIf } from '@angular/common';
+import { NgIf, NgFor, formatDate } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { TaskService } from '../../services/task/task.service';
 import { Task } from '../../models/task';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-task-list',
@@ -19,10 +18,6 @@ export class TaskListComponent {
   {
     taskService.getTasks().then((tasks) => {
       this.tasks = tasks ?? [];
-      for (let task of this.tasks)
-      {
-        task.assignees = task.assignees?.map(assignee => assignee.name);
-      }
     });
   }
   

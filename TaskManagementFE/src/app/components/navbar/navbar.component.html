@@ -7,10 +7,10 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="/tasks">Tasks</a>
+            <a class="nav-link" href="/help">Help</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/help">Help & Documentation</a>
+            <a class="nav-link" href="/tasks" *ngIf="auth.isLoggedIn">Tasks</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" *ngIf="auth.isAdmin">
@@ -23,17 +23,18 @@
         </ul>
         
         <ul class="navbar-nav">
-          <li class="nav-item">
-            <form class="d-flex" role="search">
-              <input class="form-control me-2" type="search" placeholder="Search Tasks..." aria-label="Search">
-              <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
+          <li class="nav-item" *ngIf="auth.isLoggedIn">
+            <input id="search" class="form-control me-2" style="min-width: 230px;" type="search" placeholder="Search Tasks & Comments" aria-label="Search">
+          </li>
+          
+          <li class="nav-item ms-1" *ngIf="auth.isLoggedIn">
+            <button class="btn btn-outline-success" (click)="onSearchSubmit()">Search</button>
           </li>
 
           <li class="nav-item" *ngIf="!auth.isLoggedIn">
             <a class="nav-link" href="/login">Login</a>
           </li>
-
+          
           <li class="nav-item" *ngIf="auth.isLoggedIn">
             <a class="nav-link" role="button" (click)="auth.logout()">Logout ({{ auth.getUsername }})</a>
           </li>

@@ -15,7 +15,6 @@ namespace TaskManagementBE.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles ="Admin")]
     public class UserController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
@@ -28,6 +27,7 @@ namespace TaskManagementBE.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserViewModel>> Create(User newUser)
         {
             var result = await _userManager.CreateAsync(newUser);
@@ -41,6 +41,7 @@ namespace TaskManagementBE.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserViewModel>> Update(User newUser)
         {
             var user = await _userManager.FindByIdAsync(newUser.Id.ToString());
@@ -54,6 +55,7 @@ namespace TaskManagementBE.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserViewModel>> Delete(Guid id)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
@@ -75,7 +77,7 @@ namespace TaskManagementBE.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<ActionResult<IEnumerable<UserViewModel>>> GetAll()
         {
             List<UserViewModel> users = new List<UserViewModel>();

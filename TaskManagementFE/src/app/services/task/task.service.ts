@@ -60,11 +60,19 @@ export class TaskService {
     }
   }
 
-  public async getTasks() : Promise<Task[] | undefined>
+  public async getTasks(search? :string) : Promise<Task[] | undefined>
   {
     try
     {
-      var observable = this.server.request('GET', '/api/Task');
+      var observable;
+      if (search)
+      {
+        observable = this.server.request('GET', `/api/Task?search=${search}`);
+      }
+      else
+      {
+        observable = this.server.request('GET', '/api/Task');
+      }
       return await lastValueFrom(observable) as Promise<Task[]>;
     }
     catch
@@ -77,7 +85,7 @@ export class TaskService {
   {
     try
     {
-      var observable = this.server.request('POST', `/api/Task/${taskId}/Assign`, users);
+      var observable = this.server.request('POST', `/api/Task/Assign/${taskId}`, users);
       return await lastValueFrom(observable) as Promise<Task>;
     }
     catch
@@ -85,4 +93,19 @@ export class TaskService {
       return undefined;
     }
   }
+
+  // Does this really belong here?
+  public async getPossibleAssignees() : Promise<any[] | undefined>
+  {
+    try
+    {
+      var observable = this.server.request('GET', '/api/User');
+      return await lastValueFrom(observable) as Promise<any[]>;
+    }
+    catch
+    {
+      return undefined;
+    }
+  }
+
 }

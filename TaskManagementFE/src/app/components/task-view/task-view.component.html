@@ -17,8 +17,8 @@
                 <span class="badge badge-pill bg-dark ms-1">Created: {{dateDisplay(task.dateAdded)}}</span>
 
                 <span class="float-end">
-                        <button class="btn btn-primary" *ngIf="auth.isOwnerOrAdmin(task.creator.id ?? '')" (click)="editTask()">Edit</button>
-                        <button class="btn btn-danger ms-2" *ngIf="auth.isOwnerOrAdmin(task.creator.id ?? '')" (click)="deleteTask()">Delete</button>
+                        <button class="btn btn-primary" *ngIf="auth.isOwnerOrAdmin(task.creator.id)" (click)="editTask()">Edit</button>
+                        <button class="btn btn-danger ms-2" *ngIf="auth.isOwnerOrAdmin(task.creator.id)" (click)="deleteTask()">Delete</button>
                 </span>
             </div>
             <div>
@@ -27,9 +27,9 @@
                     <span class="badge bg-danger me-1">Nobody</span>
                 </span>
                 <span  *ngIf="assignedToAnyone">
-                    <span class="badge bg-warning me-1" *ngFor="let assignee of task.assignees">{{assignee}}</span>
+                    <span class="badge bg-warning me-1" *ngFor="let assignee of task.assignees">{{assignee.username}}</span>
                 </span>
-                <span class="badge bg-success pointer" id="assign" *ngIf="auth.isOwnerOrAdmin(task.creator.id ?? '')" (click)="editAssigned()">+</span>
+                <span class="badge bg-success pointer" id="assign" *ngIf="auth.isOwnerOrAdmin(task.creator.id)" (click)="showAssignment()">+</span>
             </div>
             <div class="d-block card mt-3">
                 <div class="card-body">
@@ -74,12 +74,41 @@
                     </div>
                     
                     <div class="splitBtns">
-                        <button type="submit" class="btn btn-primary me-3" *ngIf="!isUpdate">Post Comment</button>
-                        <button type="submit" class="btn btn-warning me-3" *ngIf="isUpdate">Update Comment</button>
-                        <button class="btn btn-danger ms-3" *ngIf="isUpdate" (click)="cancelEditComment()">Cancel Edit</button>
+                        <button type="submit" class="btn btn-primary me-3" *ngIf="!commentIsUpdate">Post Comment</button>
+                        <button type="submit" class="btn btn-warning me-3" *ngIf="commentIsUpdate">Update Comment</button>
+                        <button class="btn btn-danger ms-3" *ngIf="commentIsUpdate" (click)="cancelEditComment()">Cancel Edit</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+
+<div class="modal" id="assignment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assign to task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeAssignment()"></button>
+            </div>
+            <form class="form-inline" [formGroup]="assignForm" (ngSubmit)="onAssignmentSubmit()">
+                <div class="modal-body">
+                        <div formGroupName="userList">
+                            <div *ngFor="let user of assignmentProspects" class="col-md-2">
+                                <label>
+                                    <input type="checkbox" [value]="user.id" (change)="markAssignment($event)">
+                                    {{user.username}}
+                                </label>
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeAssignment()">Cancel</button>
+                    <button type="submit" class="btn btn-success">Assign</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+  

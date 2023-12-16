@@ -18,7 +18,7 @@ namespace TaskManagementBE.Services
             var result = _context.Tasks.Find(task.Id);
             _context.Entry(result).Reference(t => t.Creator).Load();
             _context.Entry(result).Collection(t => t.Assignees).Load();
-            _context.Entry(result).Collection(t => t.Comments).Load();
+            _context.Tasks.Include(_context => _context.Comments).ThenInclude(c => c.Creator).Load();
             return result;
         }
 
@@ -29,7 +29,7 @@ namespace TaskManagementBE.Services
             var result = _context.Tasks.Find(task.Id);
             _context.Entry(result).Reference(t => t.Creator).Load();
             _context.Entry(result).Collection(t => t.Assignees).Load();
-            _context.Entry(result).Collection(t => t.Comments).Load();
+            _context.Tasks.Include(_context => _context.Comments).ThenInclude(c => c.Creator).Load();
             return result;
         }
 
@@ -38,7 +38,7 @@ namespace TaskManagementBE.Services
             Models.Task task = _context.Tasks.Find(id);
             _context.Entry(task).Reference(t => t.Creator).Load();
             _context.Entry(task).Collection(t => t.Assignees).Load();
-            _context.Entry(task).Collection(t => t.Comments).Load();
+            _context.Tasks.Include(_context => _context.Comments).ThenInclude(c => c.Creator).Load();
             _context.Tasks.Remove(task);
             _context.SaveChanges();
             return task;
@@ -49,7 +49,7 @@ namespace TaskManagementBE.Services
             Models.Task task = _context.Tasks.Find(id);
             _context.Entry(task).Reference(t => t.Creator).Load();
             _context.Entry(task).Collection(t => t.Assignees).Load();
-            _context.Entry(task).Collection(t => t.Comments).Load();
+            _context.Tasks.Include(_context => _context.Comments).ThenInclude(c => c.Creator).Load();
             return task;
         }
 
@@ -71,7 +71,7 @@ namespace TaskManagementBE.Services
             {
                 _context.Entry(task).Reference(t => t.Creator).Load();
                 _context.Entry(task).Collection(t => t.Assignees).Load();
-                _context.Entry(task).Collection(t => t.Comments).Load();
+                _context.Tasks.Include(_context => _context.Comments).ThenInclude(c => c.Creator).Load();
             }
             return result;
         }

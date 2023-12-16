@@ -62,14 +62,15 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "proxyConfig": "./proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "buildTarget": "TaskManagementFE:build:production"
+              "buildTarget": "TaskManagementFE:build:production",
+              "proxyConfig": "./proxy.conf.json"
             },
             "development": {
-              "buildTarget": "TaskManagementFE:build:development"
+              "buildTarget": "TaskManagementFE:build:development",
+              "proxyConfig": "./proxy.development.conf.json"
             }
           },
           "defaultConfiguration": "development"

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgFor } from '@angular/common';
-import { ServerService } from '../../services/server/server.service';
+import { TaskService } from '../../services/task/task.service';
 
 @Component({
   selector: 'app-user-list',
@@ -11,10 +11,10 @@ import { ServerService } from '../../services/server/server.service';
 })
 export class UserListComponent {
   users: any[] = [];
-  constructor(private server: ServerService)
+  constructor(private taskService: TaskService)
   {
-    this.server.request('GET', '/api/User', {}).subscribe((data: any) => {
-      this.users = data;
+    this.taskService.getPossibleAssignees().then((users) => {
+      this.users = users || [];
     });
   }
 }

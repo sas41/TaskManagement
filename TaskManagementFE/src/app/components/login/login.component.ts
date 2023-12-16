@@ -32,6 +32,5 @@ export class LoginComponent {
     } else {
       this.formSubmitAttempt = true;
     }
-    //this.loginForm.reset();
   }
 }

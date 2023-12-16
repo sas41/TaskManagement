@@ -60,11 +60,19 @@ export class CommentService {
     }
   }
 
-  public async getComments() : Promise<Comment[] | undefined>
+  public async getComments(search? : string) : Promise<Comment[] | undefined>
   {
     try
     {
-      var observable = this.server.request('GET', '/api/Comment');
+      var observable;
+      if(search)
+      {
+        observable = this.server.request('GET', `/api/Comment?search=${search}`);
+      }
+      else
+      {
+        observable = this.server.request('GET', '/api/Comment');
+      }
       return await lastValueFrom(observable) as Promise<Comment[]>;
     }
     catch

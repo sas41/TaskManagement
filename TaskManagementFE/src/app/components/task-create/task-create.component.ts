@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { NgFor, NgIf, formatDate } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {ActivatedRoute, Router} from "@angular/router";
-import { Task } from '../../models/task';
 import { TaskService } from '../../services/task/task.service';
+import { Task } from '../../models/task';
 
 const defaultDueInDays = 7;
 const defaultDueIn = 1000*60*60*24*defaultDueInDays;

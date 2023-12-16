@@ -12,7 +12,6 @@ namespace TaskManagementBE.Controllers
     [ApiController]
     [Route("api/[controller]")]
 
-    [Authorize(Roles = "Admin, Manager")]
     public class TaskController : ControllerBase
     {
         private readonly ITaskService _taskService;
@@ -25,6 +24,7 @@ namespace TaskManagementBE.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<ActionResult<TaskViewModel>> Create(TaskCreateModel newTask)
         {
             Models.Task task = newTask.ToTask();
@@ -35,6 +35,7 @@ namespace TaskManagementBE.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin, Manager")]
         public ActionResult<TaskViewModel> Update(Guid id, TaskCreateModel newTask)
         {
             Models.Task task = _taskService.GetById(id);
@@ -51,6 +52,7 @@ namespace TaskManagementBE.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin, Manager")]
         public ActionResult<TaskViewModel> Delete(Guid id)
         {
             Models.Task task = _taskService.GetById(id);
@@ -82,15 +84,16 @@ namespace TaskManagementBE.Controllers
 
         [HttpPost("Assign/{id}")]
         [Authorize]
-        public async Task<ActionResult<TaskViewModel>> Assign(Guid taskId, [FromBody]ICollection<Guid> userIds)
+        public async Task<ActionResult<TaskViewModel>> Assign(Guid id, [FromBody]ICollection<Guid> userIds)
         {
-            Models.Task task = _taskService.GetById(taskId);
+            Models.Task task = _taskService.GetById(id);
 
             string callerId = this.User.Claims.Where(claim => claim.Type == "id").First().Value;
             bool isOwner = (callerId == task.CreatorId.ToString());
             bool isAdmin = this.User.IsInRole("Admin");
             if (isOwner || isAdmin)
             {
+                task.Assignees.Clear();
                 foreach (Guid userId in userIds)
                 {
                     var user = await _userManager.FindByIdAsync(userId.ToString());
